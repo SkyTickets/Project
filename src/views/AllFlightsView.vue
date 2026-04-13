@@ -48,9 +48,8 @@ const toFlight = (id) => {
   router.push({ name: 'Flight', params: { id } })
 }
 
-// Применение фильтров
 const applyFilters = debounce(async () => {
-  console.log('🔄 applyFilters called with:', searchParams.value) // для отладки
+  console.log('🔄 applyFilters called with:', searchParams.value)
 
   await flightStore.searchFlights(
     searchParams.value.cityFrom || '',
@@ -67,11 +66,9 @@ const applyFilters = debounce(async () => {
   }
 }, 350)
 
-// Следим за ВСЕМИ изменениями параметров
 watch(searchParams, applyFilters, { deep: true })
 
 onMounted(async () => {
-  // Загружаем все рейсы сразу
   await flightStore.getCurrentFlights()
 
   await Promise.all([
