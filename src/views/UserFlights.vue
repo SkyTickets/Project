@@ -20,7 +20,7 @@ onMounted(async () => {
 
 <template>
   <div class="tickets-wrapper">
-    <div class="tickets-table">
+    <div class="output">
       <user-flight-card
         v-for="el in ticketStore.ticketsList"
         :key="el.id"
@@ -51,6 +51,7 @@ onMounted(async () => {
 
 .tickets-table {
   min-width: 850px;
+  align-items: stretch;
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -64,4 +65,26 @@ onMounted(async () => {
   background: rgba(0,0,0,0.2);
   border-radius: 3px;
 }
+
+.output {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: auto;
+}
+
+.flights-output {
+  border: 3px solid var(--color-purple-extralight);
+  border-radius: 6px;
+  padding: 3px;
+}
+
+.flights-output div {
+  border-bottom: 2px solid var(--color-purple-extralight);
+}
+
+.flights-output div:last-child {
+  border-bottom: none;
+}
+
 </style>

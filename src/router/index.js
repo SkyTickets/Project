@@ -40,6 +40,12 @@ const router = createRouter({
       meta: { isLoginNeeded: true },
     },
     {
+      path: '/tickets/:id',
+      name: 'TicketView',
+      component: () => import('../views/TicketView.vue'),
+      meta: { isLoginNeeded: true },
+    },
+    {
       path: '/admin',
       name: 'Admin',
       component: () => import('@/views/AdminView.vue'),

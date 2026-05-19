@@ -8,7 +8,9 @@ const props = defineProps({
   },
 })
 
+const imgError = ref(false)
 const imageSource = ref(`http://localhost:3000/images/${props.flight.airlineImage}`)
+const airlineInitial = (props.flight.fAirline || '?').charAt(0)
 
 const getFlightTime = (arrivalTime, departureTime) => {
   const difference = arrivalTime - departureTime
@@ -30,14 +32,24 @@ const getFlightTime = (arrivalTime, departureTime) => {
 
 <template>
   <div class="flight-card">
-    <img :src="imageSource" alt="" width="40" height="40" />
-    <div>
+    <div class="first-col">
+      <img
+        v-if="!imgError"
+        :src="imageSource"
+        alt=""
+        width="40"
+        height="40"
+        @error="imgError = true"
+      />
+      <div v-else class="airline-placeholder">{{ airlineInitial }}</div>
+    </div>
+    <div class="second-col">
       <p class="primary">
         {{ getFlightTime(new Date(flight.fArrivalTime), new Date(flight.fDepartureTime)) }}
       </p>
       <p class="secondary">{{ flight.fAirline }}</p>
     </div>
-    <div>
+    <div class="third-col">
       <p class="primary">{{ flight.fDepartureAirport }} - {{ flight.fArrivalAirport }}</p>
       <p class="secondary">
         {{
@@ -55,7 +67,11 @@ const getFlightTime = (arrivalTime, departureTime) => {
         }}
       </p>
     </div>
-    <div>
+    <div class="fourth-col">
+      <p class="primary seats-count">{{ flight.fAvailableSeats ?? flight.fSeatsCount }}</p>
+      <p class="secondary">мест свободно</p>
+    </div>
+    <div class="fifth-col">
       <p class="primary">{{ flight.fPrice }} ₽</p>
     </div>
   </div>
@@ -63,22 +79,55 @@ const getFlightTime = (arrivalTime, departureTime) => {
 
 <style scoped>
 .flight-card {
-  display: flex;
-  flex-direction: row;
+  display: grid;
+  grid-template-columns: 45px minmax(0, 1fr) minmax(0, 3fr) minmax(0, 1fr) minmax(0, 1fr);
   background: white;
-  justify-content: space-around;
   align-items: center;
-  padding-left: 50px;
+  padding: 0 15px;
+  height: 80px;
+  gap: 10px;
+  width: 100%;
 }
 
-.flight-card div {
-  align-self: center;
+.airline-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: #e3f2fd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 700;
+  color: #1565c0;
+}
+
+.first-col {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.second-col, .third-col, .fourth-col {
   height: auto;
-  width: 25vw;
+  width: 100%;
 }
 
+.fifth-col {
+  height: auto;
+  width: 100%;
+  text-align: center;
+}
+
+/* Выравнивание текста по левому краю для аккуратности */
 .flight-card p {
   text-align: center;
+}
+
+/* Цену во второй карточке прижмем вправо, к кнопке */
+.fifth-col p {
+  text-align: right;
+  padding-right: 10px;
 }
 
 .flight-card:hover {
@@ -91,11 +140,15 @@ const getFlightTime = (arrivalTime, departureTime) => {
 
 .primary {
   color: var(--color-grey-900);
-  text-wrap: nowrap;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .secondary {
   color: var(--color-grey-400);
-  text-wrap: nowrap;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 </style>
