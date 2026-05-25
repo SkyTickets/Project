@@ -3,7 +3,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useToast } from 'vue-toastification'
 import { useRouter } from 'vue-router'
 import useFlightStore from '@/stores/flight.js'
-import useTicketStore from '@/stores/ticket.js'
+import useBookingStore from '@/stores/booking.js'
 import useUserStore from '@/stores/user.js'
 
 const props = defineProps({
@@ -15,10 +15,15 @@ const props = defineProps({
     type: Number,
     required: true,
   },
+  // Бронирование целиком — нужно для changeBookingStatus
+  booking: {
+    type: Object,
+    required: true,
+  },
 })
 
 const flightStore = useFlightStore()
-const ticketStore = useTicketStore()
+const bookingStore = useBookingStore()
 const userStore = useUserStore()
 const toast = useToast()
 const router = useRouter()
@@ -36,13 +41,26 @@ onMounted(async () => {
 const imageSource = computed(() => `http://localhost:3000/images/${flight.value?.airlineImage}`)
 const airlineInitial = computed(() => (flight.value?.fAirline || '?').charAt(0))
 
+// Статус берём из бронирования (bStatus), т.к. у билета нет собственного статуса
+const bookingStatus = computed(() => props.booking?.bStatus || '—')
+const isCancelled = computed(() => bookingStatus.value === 'Отменен')
+const canCancel = computed(() =>
+  !isCancelled.value &&
+  (props.ticket.tClass === 'Бизнес' || props.ticket.tClass === 'Первый класс')
+)
+
 const cancelTicket = async () => {
-  if (confirm('Вы действительно хотите отменить билет? Это действие нельзя отменить')) {
-    props.ticket.tStatus = 'Отменен'
-    await ticketStore.changeTicketStatus(props.ticket, userStore.currentUser)
-    if (ticketStore.ticketError) {
-      toast.error(ticketStore.ticketError)
-    }
+  if (!confirm('Вы действительно хотите отменить бронирование? Это действие нельзя отменить')) return
+
+  await bookingStore.changeBookingStatus({
+    ...props.booking,
+    bStatus: 'Отменен',
+  })
+
+  if (bookingStore.bookingError) {
+    toast.error(bookingStore.bookingError)
+  } else {
+    toast.success('Бронирование отменено')
   }
 }
 
@@ -86,11 +104,11 @@ const viewTicket = () => {
       </p>
     </div>
     <div class="fourth-col">
-      <p class="primary">{{ ticket.tTotalPrice }} ₽</p>
+      <p class="primary">{{ ticket.tPrice }} ₽</p>
       <p class="secondary">Стоимость билета</p>
     </div>
     <div class="fifth-col">
-      <p class="primary">{{ ticket.tStatus }}</p>
+      <p class="primary">{{ bookingStatus }}</p>
       <p class="secondary">Статус</p>
     </div>
     <div class="sixth-col">
@@ -98,18 +116,19 @@ const viewTicket = () => {
       <p class="secondary">Класс обслуживания</p>
     </div>
     <div class="actions-cell">
-      <button :disabled="(ticket.tClass === 'Бизнес' || ticket.tClass === 'Первый класс') ? false : true"
-              :class="{ 'btn btn-disabled':!(ticket.tClass === 'Бизнес' || ticket.tClass === 'Первый класс'),
-              'btn btn-cancel': (ticket.tClass === 'Бизнес' || ticket.tClass === 'Первый класс')}"
-        v-if="ticket.tStatus !== 'Отменен'"
-        type="button"
-        @click="cancelTicket">Отменить</button>
       <button
-        v-else-if="ticket.tStatus === 'Отменен'"
+        v-if="!isCancelled"
+        :disabled="!canCancel"
+        :class="canCancel ? 'btn btn-cancel' : 'btn btn-disabled'"
+        type="button"
+        @click="cancelTicket"
+      >Отменить</button>
+      <button
+        v-else
         class="btn btn-disabled"
         type="button"
         disabled
-      >Отменен</button>
+      >Отменён</button>
     </div>
   </div>
 </template>

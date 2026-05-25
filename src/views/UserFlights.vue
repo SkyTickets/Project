@@ -1,90 +1,54 @@
 <script setup>
-import UserFlightCard from '@/components/user-flight-card.vue'
+import BookingCard from '@/components/booking-card.vue'
 import useUserStore from '@/stores/user.js'
-import useTicketStore from '@/stores/ticket.js'
+import useBookingStore from '@/stores/booking.js'
 import { onMounted } from 'vue'
 import { useToast } from 'vue-toastification'
 
 const toast = useToast()
-
 const userStore = useUserStore()
-const ticketStore = useTicketStore()
+const bookingStore = useBookingStore()
 
 onMounted(async () => {
-  await ticketStore.getUserTickets(userStore.currentUser.uId)
-  if (ticketStore.ticketError) {
-    toast.error(ticketStore.ticketError)
+  await bookingStore.getUserBookings(userStore.currentUser.uId)
+  if (bookingStore.bookingError) {
+    toast.error(bookingStore.bookingError)
   }
 })
 </script>
 
 <template>
-  <div class="tickets-wrapper">
-    <div class="output">
-      <user-flight-card
-        v-for="el in ticketStore.ticketsList"
-        :key="el.id"
-        :flightId="el.tFlight"
-        :ticket="el"
+  <div class="bookings-wrapper">
+    <div v-if="!bookingStore.bookingsList.length" class="empty-state">
+      <p>У вас пока нет бронирований</p>
+    </div>
+    <div class="output" v-else>
+      <booking-card
+        v-for="booking in bookingStore.bookingsList"
+        :key="booking.bId"
+        :booking="booking"
       />
     </div>
   </div>
 </template>
 
 <style scoped>
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: --font-family-nunito-sans, sans-serif;
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+.bookings-wrapper {
+  padding: 20px;
 }
 
-.tickets-wrapper {
-  width: auto;
-  overflow-x: auto;
-  overflow-y: hidden;
-  border: 3px solid var(--color-purple-extralight);
-  border-radius: 8px;
-  margin: 20px;
-  -webkit-overflow-scrolling: touch;
-}
-
-.tickets-table {
-  min-width: 850px;
-  align-items: stretch;
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: 10px;
-}
-
-.tickets-wrapper::-webkit-scrollbar {
-  height: 6px;
-}
-.tickets-wrapper::-webkit-scrollbar-thumb {
-  background: rgba(0,0,0,0.2);
-  border-radius: 3px;
+.empty-state {
+  padding: 60px;
+  text-align: center;
+  color: var(--color-grey-400);
+  font-size: 16px;
 }
 
 .output {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  width: auto;
+  gap: 12px;
 }
-
-.flights-output {
-  border: 3px solid var(--color-purple-extralight);
-  border-radius: 6px;
-  padding: 3px;
-}
-
-.flights-output div {
-  border-bottom: 2px solid var(--color-purple-extralight);
-}
-
-.flights-output div:last-child {
-  border-bottom: none;
-}
-
 </style>

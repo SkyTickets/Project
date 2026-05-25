@@ -2,13 +2,21 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import axios from 'axios'
 
+// Изменения относительно старого API:
+// - addTicket и changeTicketStatus удалены → перенесены в useBookingStore
+// - getUserTickets удалён → билеты получаются через бронирование (GetBookingTickets)
+// - Добавлены: getBookingTickets, addService, removeService
+// - Ответ теперь массив (не объект-словарь), поэтому Object.keys() убран
+
+const BASE = 'http://localhost:5267/api'
+
 const useTicketStore = defineStore('tickets', () => {
   const currentTicket = ref(null)
   const ticketError = ref(null)
   const ticketsList = ref([])
 
   function getError(err) {
-    if (!err.response || err.response.status === 502) {
+    if (!err.response || err.response.status >= 500) {
       ticketError.value =
         'SkyTickets в настоящее время испытывает перебои в работе. Повторите попытку позже.'
       return
@@ -18,29 +26,9 @@ const useTicketStore = defineStore('tickets', () => {
 
   const getTickets = async () => {
     await axios
-      .get('http://localhost:5267/api/ticket/GetTickets')
+      .get(`${BASE}/Ticket/GetTickets`)
       .then((res) => {
-        ticketsList.value = Object.keys(res.data).map((key) => {
-          return {
-            id: key,
-            ...res.data[key],
-          }
-        })
-        ticketError.value = null
-      })
-      .catch((err) => getError(err))
-  }
-
-  const getUserTickets = async (userId) => {
-    await axios
-      .get(`http://localhost:5267/api/ticket/GetUserTickets/${userId}`)
-      .then((res) => {
-        ticketsList.value = Object.keys(res.data).map((key) => {
-          return {
-            id: key,
-            ...res.data[key],
-          }
-        })
+        ticketsList.value = res.data
         ticketError.value = null
       })
       .catch((err) => getError(err))
@@ -48,7 +36,7 @@ const useTicketStore = defineStore('tickets', () => {
 
   const getTicket = async (id) => {
     await axios
-      .get(`http://localhost:5267/api/ticket/GetTicket/${id}`)
+      .get(`${BASE}/Ticket/GetTicket/${id}`)
       .then((res) => {
         currentTicket.value = res.data
         ticketError.value = null
@@ -56,36 +44,32 @@ const useTicketStore = defineStore('tickets', () => {
       .catch((err) => getError(err))
   }
 
-  const addTicket = async (ticket) => {
+  // Билеты конкретного бронирования
+  const getBookingTickets = async (bookingId) => {
     await axios
-      .post('http://localhost:5267/api/ticket/AddTicket', {
-        tId: 0,
-        tFlight: ticket.flightId,
-        tUser: ticket.userEmail,
-        tBoughtDate: new Date().toISOString().split('T')[0],
-        tClass: ticket.class,
-        tTotalPrice: ticket.price,
-        tStatus: '',
-      })
+      .get(`${BASE}/Ticket/GetBookingTickets/${bookingId}`)
       .then((res) => {
-        if (ticketsList.value.length) {
-          ticketsList.value.push(res.data)
-        }
+        ticketsList.value = res.data
         ticketError.value = null
       })
       .catch((err) => getError(err))
   }
 
-  const changeTicketStatus = async (ticket, user) => {
+  // Добавить дополнительную услугу к билету
+  const addService = async (ticketId, serviceId) => {
     await axios
-      .post('http://localhost:5267/api/ticket/ChangeTicketStatus', ticket)
-      .then((res) => {
-        if (ticketsList.value.length) {
-          const index = ticketsList.value.findIndex((item) => item.tId === ticket.id)
-          if (index > -1) {
-            ticketsList.value[index] = res.data
-          }
-        }
+      .post(`${BASE}/Ticket/AddService`, { ticketId, serviceId })
+      .then(() => {
+        ticketError.value = null
+      })
+      .catch((err) => getError(err))
+  }
+
+  // Удалить дополнительную услугу с билета
+  const removeService = async (ticketId, serviceId) => {
+    await axios
+      .post(`${BASE}/Ticket/RemoveService`, { ticketId, serviceId })
+      .then(() => {
         ticketError.value = null
       })
       .catch((err) => getError(err))
@@ -100,10 +84,10 @@ const useTicketStore = defineStore('tickets', () => {
     ticketError,
     ticketsList,
     getTickets,
-    getUserTickets,
     getTicket,
-    addTicket,
-    changeTicketStatus,
+    getBookingTickets,
+    addService,
+    removeService,
     clearTickets,
   }
 })

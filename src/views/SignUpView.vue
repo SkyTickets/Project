@@ -1,6 +1,7 @@
 <script setup>
 import { ref, useTemplateRef } from 'vue'
 import useUserStore from '@/stores/user.js'
+import usePassengerStore from '@/stores/passenger.js'
 import { useToast } from 'vue-toastification'
 import { useRouter } from 'vue-router'
 import { ru } from 'date-fns/locale'
@@ -8,6 +9,7 @@ import { ru } from 'date-fns/locale'
 const toast = useToast()
 const router = useRouter()
 const store = useUserStore()
+const passengerStore = usePassengerStore()
 const selectedDate = ref()
 
 const surnameInput = useTemplateRef('surname-input')
@@ -16,8 +18,6 @@ const patronymicInput = useTemplateRef('patronymic-input')
 const loginInput = useTemplateRef('login-input')
 const passwordInput = useTemplateRef('password-input')
 const phoneInput = useTemplateRef('phone-input')
-const serialInput = useTemplateRef('serial-input')
-const numberInput = useTemplateRef('number-input')
 
 const getValue = (ref) => {
   const el = ref.value
@@ -38,10 +38,8 @@ const signUp = async () => {
   let password = getValue(passwordInput)
   let phone = getValue(phoneInput)
   let birthdate = selectedDate.value ? selectedDate.value.toISOString().split('T')[0] : null
-  let serial = getValue(serialInput)
-  let number = getValue(numberInput)
 
-  if (!surname || !name || !login || !password || !phone || !birthdate || !serial || !number) {
+  if (!surname || !name || !login || !password || !phone || !birthdate) {
     toast.error('Заполните все поля')
     return
   }
@@ -66,33 +64,15 @@ const signUp = async () => {
     toast.error('Вам должно быть не меньше 18 лет')
     return
   }
-  if (isNaN(parseInt(serial))) {
-    toast.error('Серия паспорта должен быть числом')
-    return
-  }
-  if (isNaN(parseInt(number))) {
-    toast.error('Номер паспорта должен быть числом')
-    return
-  }
-  if (serial.length !== 4) {
-    toast.error('Серия паспорта состоит из 4 цифр')
-    return
-  }
-  if (number.length !== 6) {
-    toast.error('Номер паспорта состоит из 6 цифр')
-    return
-  }
 
   const user = {
-    surname: surname,
-    name: name,
-    patronymic: patronymic ? patronymic : '',
-    login: login,
-    password: password,
-    phone: phone,
-    birthdate: birthdate,
-    serial: serial,
-    number: number,
+    surname,
+    name,
+    patronymic: patronymic || '',
+    login,
+    password,
+    phone,
+    birthdate,
   }
 
   await store.register(user)
@@ -103,7 +83,7 @@ const signUp = async () => {
   }
 
   if (store.currentUser) {
-    toast.success("Регистрация прошла успешно")
+    toast.success('Регистрация прошла успешно')
     await router.push({ name: 'Home' })
   }
 }
@@ -126,7 +106,6 @@ const signUp = async () => {
 
     <div class="input-wrapper">
       <input type="text" placeholder="Введите отчество" ref="patronymic-input" />
-      <!-- Отчество не обязательно — без * -->
     </div>
 
     <div class="input-wrapper">
@@ -156,29 +135,6 @@ const signUp = async () => {
       <span class="required-indicator">*</span>
     </div>
 
-    <div class="input-wrapper">
-      <input
-        type="text"
-        minlength="4"
-        maxlength="4"
-        required
-        placeholder="Введите серию паспорта"
-        ref="serial-input"
-      />
-      <span class="required-indicator">*</span>
-    </div>
-
-    <div class="input-wrapper">
-      <input
-        type="text"
-        minlength="6"
-        maxlength="6"
-        required
-        placeholder="Введите номер паспорта"
-        ref="number-input"
-      />
-      <span class="required-indicator">*</span>
-    </div>
     <p class="required-hint"><span style="color: #e74c3c">*</span> — обязательные поля</p>
     <div class="actions">
       <button type="button" class="btn" @click="signUp">Зарегистрироваться</button>
@@ -252,7 +208,7 @@ svg:hover {
 .input-wrapper input,
 .input-wrapper .datepicker {
   width: 100%;
-  padding-right: 30px; /* место под звёздочку */
+  padding-right: 30px;
 }
 
 .required-indicator {

@@ -2,19 +2,29 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
 
+// Изменения относительно старого API:
+// - register: убраны поля uPassportSerial, uPassportNumber, uRole (паспорт теперь у Passenger,
+//   роль назначается сервером автоматически как «Клиент»)
+// - getUser: исправлен — теперь возвращает данные (раньше return был внутри .then, не выходя из async fn)
+// - Добавлен uploadUserImage
+// - Ответ API теперь массив, Object.keys() убран в getUsers
+
+const BASE = 'http://localhost:5267/api'
+
 const useUserStore = defineStore('users', () => {
   const currentUser = ref(null)
   const userError = ref(null)
   const usersList = ref([])
 
   function getError(err) {
-    if (!err.response || err.response.status === 502) {
+    if (!err.response || err.response.status >= 500) {
       userError.value =
         'SkyTickets в настоящее время испытывает перебои в работе. Повторите попытку позже.'
       return
     }
     userError.value = err.response.data
   }
+
   async function login(user) {
     if (localStorage.getItem('user')) {
       const localUser = JSON.parse(localStorage.getItem('user'))
@@ -24,11 +34,8 @@ const useUserStore = defineStore('users', () => {
 
     await axios
       .postForm(
-        'http://localhost:5267/api/user/auth',
-        {
-          login: user.login,
-          password: user.password,
-        },
+        `${BASE}/User/Auth`,
+        { login: user.login, password: user.password },
         {
           headers: {
             'Content-Type': 'multipart/form-data',
@@ -41,10 +48,7 @@ const useUserStore = defineStore('users', () => {
         if (!localStorage.getItem('user')) {
           localStorage.setItem(
             'user',
-            JSON.stringify({
-              login: user.login,
-              password: res.data.uPassword,
-            }),
+            JSON.stringify({ login: user.login, password: res.data.uPassword }),
           )
         }
         userError.value = null
@@ -59,28 +63,23 @@ const useUserStore = defineStore('users', () => {
 
   async function register(user) {
     await axios
-      .post('http://localhost:5267/api/User/Register', {
+      .post(`${BASE}/User/Register`, {
         uId: 0,
         uSurname: user.surname,
         uName: user.name,
-        uPatronymic: user.patronymic,
+        uPatronymic: user.patronymic ?? null,
         uEmail: user.login,
         uPassword: user.password,
-        uRole: '',
+        uRole: '',         // сервер назначит «Клиент» автоматически
         uPhone: user.phone,
         uBirthdate: user.birthdate,
-        uPassportSerial: user.serial,
-        uPassportNumber: user.number,
       })
       .then((res) => {
         currentUser.value = res.data
         if (!localStorage.getItem('user')) {
           localStorage.setItem(
             'user',
-            JSON.stringify({
-              login: user.login,
-              password: res.data.uPassword,
-            }),
+            JSON.stringify({ login: user.login, password: res.data.uPassword }),
           )
         }
         userError.value = null
@@ -90,32 +89,29 @@ const useUserStore = defineStore('users', () => {
 
   async function getUsers() {
     await axios
-      .get('http://localhost:5267/api/User/GetUsers')
+      .get(`${BASE}/User/GetUsers`)
       .then((res) => {
-        usersList.value = Object.keys(res.data).map((key) => {
-          return {
-            id: key,
-            ...res.data[key],
-          }
-        })
+        usersList.value = res.data   // API возвращает массив напрямую
         userError.value = null
       })
       .catch((err) => getError(err))
   }
 
   async function getUser(userId) {
+    let data = null
     await axios
-      .get(`http://localhost:5267/api/User/GetUser/${userId}`)
+      .get(`${BASE}/User/GetUser/${userId}`)
       .then((res) => {
+        data = res.data
         userError.value = null
-        return res.data
       })
       .catch((err) => getError(err))
+    return data
   }
 
   async function editUser(user, isPasswordEditing) {
     await axios
-      .post('http://localhost:5267/api/User/EditUser', user)
+      .post(`${BASE}/User/EditUser`, user)
       .then(async (res) => {
         currentUser.value = res.data
         userError.value = null
@@ -128,7 +124,7 @@ const useUserStore = defineStore('users', () => {
 
   async function changeUserPassword(user) {
     await axios
-      .post('http://localhost:5267/api/User/ChangePassword', user)
+      .post(`${BASE}/User/ChangePassword`, user)
       .then((res) => {
         currentUser.value = res.data
         userError.value = null
@@ -142,7 +138,7 @@ const useUserStore = defineStore('users', () => {
       return
     }
     await axios
-      .delete(`http://localhost:5267/api/User/DeleteUser/${userId}`)
+      .delete(`${BASE}/User/DeleteUser/${userId}`)
       .then(() => {
         if (usersList.value.length > 0) {
           const index = usersList.value.findIndex((u) => u.uId === userId)
@@ -153,6 +149,21 @@ const useUserStore = defineStore('users', () => {
         if (currentUser.value.uId === userId) {
           currentUser.value = null
         }
+        userError.value = null
+      })
+      .catch((err) => getError(err))
+  }
+
+  // Загрузить аватар пользователя (multipart/form-data)
+  async function uploadUserImage(userId, file) {
+    const formData = new FormData()
+    formData.append('userId', userId)
+    formData.append('file', file)
+    await axios
+      .post(`${BASE}/User/UploadUserImage`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      })
+      .then(() => {
         userError.value = null
       })
       .catch((err) => getError(err))
@@ -170,13 +181,15 @@ const useUserStore = defineStore('users', () => {
   return {
     currentUser,
     userError,
+    usersList,
     login,
     register,
     getUsers,
     getUser,
-    usersList,
     editUser,
+    changeUserPassword,
     deleteUser,
+    uploadUserImage,
     logout,
     clearUsers,
   }

@@ -8,7 +8,7 @@ const useAirlineStore = defineStore('airlines', () => {
   const airlinesList = ref([])
 
   function getError(err) {
-    if (!err.response || err.response.status === 502) {
+    if (!err.response || err.response.status >= 500) {
       airlineError.value =
         'SkyTickets в настоящее время испытывает перебои в работе. Повторите попытку позже.'
       return

@@ -68,11 +68,11 @@ const getFlightTime = (arrivalTime, departureTime) => {
       </p>
     </div>
     <div class="fourth-col">
-      <p class="primary seats-count">{{ flight.fAvailableSeats ?? flight.fSeatsCount }}</p>
+      <p class="primary seats-count">{{ (flight.fAvailableEconomySeats+flight.fAvailableComfortSeats+flight.fAvailableBusinessSeats+flight.fAvailableFirstClassSeats) ?? ((flight.fEconomySeats+flight.fComfortSeats+flight.fBusinessSeats+flight.fFirstClassSeats)) }}</p>
       <p class="secondary">мест свободно</p>
     </div>
     <div class="fifth-col">
-      <p class="primary">{{ flight.fPrice }} ₽</p>
+      <p class="primary">от {{ flight.fBasePrice }} ₽</p>
     </div>
   </div>
 </template>

@@ -3,6 +3,7 @@ import { ref, onMounted, useTemplateRef } from 'vue'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import { useToast } from 'vue-toastification'
 import useUserStore from '@/stores/user.js'
+import { format } from 'date-fns'
 
 const surnameInput = useTemplateRef('surnameInput')
 const nameInput = useTemplateRef('nameInput')
@@ -99,8 +100,6 @@ const saveProfile = async () => {
     uPassword: password || '',
     uEmail: store.currentUser.uEmail,
     uBirthdate: store.currentUser.uBirthdate,
-    uPassportSerial: store.currentUser.uPassportSerial,
-    uPassportNumber: store.currentUser.uPassportNumber,
   }
 
   await store.editUser(payload, !!password)
@@ -207,11 +206,7 @@ const logout = () => {
       <p><strong>Имя:</strong> {{ store.currentUser?.uName }}</p>
       <p><strong>Отчество:</strong> {{ store.currentUser?.uPatronymic || '—' }}</p>
       <p><strong>Телефон:</strong> {{ store.currentUser?.uPhone }}</p>
-      <p><strong>Дата рождения:</strong> {{ store.currentUser?.uBirthdate }}</p>
-      <p>
-        <strong>Паспорт:</strong> {{ store.currentUser?.uPassportSerial }}
-        {{ store.currentUser?.uPassportNumber }}
-      </p>
+      <p><strong>Дата рождения:</strong> {{ format(store.currentUser?.uBirthdate, 'dd.MM.yyyy') }}</p>
 
       <div class="actions">
         <button @click="editProfile" class="btn edit">Редактировать профиль</button>

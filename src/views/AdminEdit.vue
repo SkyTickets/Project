@@ -28,8 +28,8 @@ const fieldsConfig = {
     { key: 'fDepartureTime', label: 'Дата и время вылета', type: 'datetime-local' },
     { key: 'fArrivalTime', label: 'Время прилёта', type: 'datetime-local' },
     { key: 'fAirline', label: 'Авиакомпания (название)', type: 'text' },
-    { key: 'fPrice', label: 'Цена (₽)', type: 'number', step: '100' },
-    { key: 'fSeatsCount', label: 'Количество мест', type: 'number' },
+    { key: 'fAirplane', label: 'Модель самолёта', type: 'text' },
+    { key: 'fBasePrice', label: 'Базовая цена (₽)', type: 'number', step: '100' },
   ],
   airline: [
     { key: 'alName', label: 'Название авиакомпании', type: 'text' },
@@ -97,8 +97,7 @@ const save = async () => {
       const flightData = {
         ...form.value,
         fId: isNew.value ? 0 : form.value.fId,
-        fPrice: Number(form.value.fPrice),
-        fSeatsCount: Number(form.value.fSeatsCount),
+        fBasePrice: Number(form.value.fBasePrice),
       }
 
       if (isNew.value) {
