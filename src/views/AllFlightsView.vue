@@ -393,39 +393,13 @@ const updateUrlQuery = () => {
           <div class="passenger-row">
             <div class="passenger-info">
               <span class="p-title">Взрослые</span>
-              <span class="p-sub">12 лет и старше</span>
+              <span class="p-sub">14 лет и старше</span>
             </div>
             <div class="counter">
               <button type="button" :class="['btn-cnt', { disabled: passengers.adults <= 1 }]"
                       @click="passengers.adults = Math.max(1, passengers.adults - 1)">−</button>
               <span class="cnt">{{ passengers.adults }}</span>
               <button type="button" class="btn-cnt btn-plus" @click="passengers.adults++">+</button>
-            </div>
-          </div>
-
-          <div class="passenger-row">
-            <div class="passenger-info">
-              <span class="p-title">Дети</span>
-              <span class="p-sub">от 2 до 11 лет</span>
-            </div>
-            <div class="counter">
-              <button type="button" :class="['btn-cnt', { disabled: passengers.children <= 0 }]"
-                      @click="passengers.children = Math.max(0, passengers.children - 1)">−</button>
-              <span class="cnt">{{ passengers.children }}</span>
-              <button type="button" class="btn-cnt btn-plus" @click="passengers.children++">+</button>
-            </div>
-          </div>
-
-          <div class="passenger-row border-none">
-            <div class="passenger-info">
-              <span class="p-title">Младенцы</span>
-              <span class="p-sub">до 2 лет, без места</span>
-            </div>
-            <div class="counter">
-              <button type="button" :class="['btn-cnt', { disabled: passengers.infants <= 0 }]"
-                      @click="passengers.infants = Math.max(0, passengers.infants - 1)">−</button>
-              <span class="cnt">{{ passengers.infants }}</span>
-              <button type="button" class="btn-cnt btn-plus" @click="passengers.infants++">+</button>
             </div>
           </div>
 

@@ -126,36 +126,12 @@ const searchFlights = () => {
             <div class="passenger-row">
               <div class="passenger-info">
                 <span class="title">Взрослые</span>
-                <span class="subtitle">12 лет и старше</span>
+                <span class="subtitle">14 лет и старше</span>
               </div>
               <div class="counter">
                 <button type="button" class="btn-minus" :class="{ disabled: passengers.adults <= 1 }" @click="passengers.adults = Math.max(1, passengers.adults-1)">−</button>
                 <span class="count">{{ passengers.adults }}</span>
                 <button type="button" class="btn-plus" @click="passengers.adults++">+</button>
-              </div>
-            </div>
-
-            <div class="passenger-row">
-              <div class="passenger-info">
-                <span class="title">Дети</span>
-                <span class="subtitle">от 2 до 11 лет</span>
-              </div>
-              <div class="counter">
-                <button type="button" class="btn-minus" :class="{ disabled: passengers.children <= 0 }" @click="passengers.children = Math.max(0, passengers.children-1)">−</button>
-                <span class="count">{{ passengers.children }}</span>
-                <button type="button" class="btn-plus" @click="passengers.children++">+</button>
-              </div>
-            </div>
-
-            <div class="passenger-row border-none">
-              <div class="passenger-info">
-                <span class="title">Младенцы</span>
-                <span class="subtitle">Младше 2 лет, без места</span>
-              </div>
-              <div class="counter">
-                <button type="button" class="btn-minus" :class="{ disabled: passengers.infants <= 0 }" @click="passengers.infants = Math.max(0, passengers.infants-1)">−</button>
-                <span class="count">{{ passengers.infants }}</span>
-                <button type="button" class="btn-plus" @click="passengers.infants++">+</button>
               </div>
             </div>
 
