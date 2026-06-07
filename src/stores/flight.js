@@ -148,7 +148,6 @@ const useFlightStore = defineStore('flights', () => {
       .catch((err) => getError(err))
   }
 
-  // page=1 сбрасывает список, page>1 — append
   const searchFlights = async (from, to, start, end, min = 0, max = 0, airline = null, passengers = 1, classOfService = null, page = 1) => {
     try {
       const payload = {
@@ -193,7 +192,7 @@ const useFlightStore = defineStore('flights', () => {
         airline: airline || null,
         passengers: Number(passengers),
         classOfServiceStr: classOfService ? classOfService.replace(' ', '_') : null,
-        page: 1, // Для обратного рейса, скорее всего, нужна 1 страница
+        page: 1,
         pageSize: 50,
       }
 
@@ -209,7 +208,6 @@ const useFlightStore = defineStore('flights', () => {
     }
   }
 
-  // Догрузить следующую страницу результатов поиска
   const loadMoreSearchFlights = async (from, to, start, end, min, max, airline, passengers, classOfService) => {
     if (!hasMore.value) return
     await searchFlights(from, to, start, end, min, max, airline, passengers, classOfService, currentPage.value + 1)

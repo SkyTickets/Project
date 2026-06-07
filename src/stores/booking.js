@@ -48,8 +48,6 @@ const useBookingStore = defineStore('bookings', () => {
       .catch((err) => getError(err))
   }
 
-  // Создать бронирование с билетами и услугами за один запрос
-  // booking: { bUser, bFlight, bTotalPrice, bStatus?, tickets: [...] }
   const addBooking = async (booking) => {
     let result = null
     await axios
@@ -74,8 +72,6 @@ const useBookingStore = defineStore('bookings', () => {
     return result
   }
 
-  // Изменить статус бронирования
-  // booking: объект ExportBooking (bId + bStatus обязательны)
   const changeBookingStatus = async (booking) => {
     await axios
       .post(`${BASE}/Booking/ChangeBookingStatus`, booking)

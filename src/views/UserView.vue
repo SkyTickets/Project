@@ -110,39 +110,6 @@ const saveProfile = async () => {
     isEditing.value = false
   }
 }
-/*
-const avatarInput = useTemplateRef('avatar-input')
-const selectedFile = ref(null)
-const avatarPreview = ref('')
-const currentAvatar = computed(() => {
-  if (avatarPreview.value) return avatarPreview.value
-  if (store.currentUser?.uAvatar) return `http://localhost:3000/${store.currentUser.uAvatar}`
-  return '/default-avatar.png'
-})
-*/
-/*
-const handleAvatarChange = (e) => {
-  const file = e.target.files[0]
-  if (!file) return
-
-  if (!file.type.startsWith('image/')) {
-    toast.error('Пожалуйста, выберите изображение')
-    return
-  }
-
-  if (file.size > 2 * 1024 * 1024) {
-    toast.error('Изображение не должно превышать 2 МБ')
-    return
-  }
-
-  selectedFile.value = file
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    avatarPreview.value = e.target.result
-  }
-  reader.readAsDataURL(file)
-}
-*/
 
 const deleteAccount = async () => {
   if (!confirm('Вы уверены, что хотите удалить аккаунт? Это действие нельзя отменить.')) {
@@ -241,32 +208,6 @@ h2 {
   color: #333;
   margin-bottom: 20px;
 }
-
-/*
-.avatar-section {
-  text-align: center;
-  margin-bottom: 20px;
-}
-
-.avatar {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 4px solid #605dec;
-}
-
-.upload-btn {
-  margin-top: 0.5rem;
-  display: inline-block;
-  padding: 0.5rem 1rem;
-  background: #605dec;
-  color: white;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
-*/
 
 .info,
 .form p {

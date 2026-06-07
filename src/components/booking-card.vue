@@ -21,7 +21,6 @@ const cancelling = ref(false)
 const showPayModal = ref(false)
 const paying = ref(false)
 
-// Выбранные услуги: { [ticketId]: Set<serviceId> }
 const selectedServices = ref({})
 
 const status = computed(() => props.booking.bStatus)
@@ -47,13 +46,38 @@ onMounted(async () => {
   }
 })
 
-// Инициализировать выбор услуг при открытии модалки
 const openPayModal = () => {
   selectedServices.value = {}
   props.booking.tickets?.forEach((t) => {
-    selectedServices.value[t.tId] = new Set(t.services?.map((s) => s.asId) ?? [])
+    const set = new Set(t.services?.map((s) => s.asId) ?? [])
+
+    const hasInsurance = [...set].some(id => {
+      const s = serviceStore.servicesList.find(item => item.asId === id)
+      return isInsuranceService(s)
+    })
+
+    if (!hasInsurance) {
+      const firstInsurance = serviceStore.servicesList.find(isInsuranceService)
+      if (firstInsurance) {
+        set.add(firstInsurance.asId)
+      }
+    }
+
+    selectedServices.value[t.tId] = set
   })
   showPayModal.value = true
+}
+
+const isInsuranceService = (service) => {
+  if (!service || !service.asName) return false
+  const name = service.asName.toLowerCase()
+  return name.includes('страхован') || name.includes('страховк')
+}
+
+const getInsuranceIds = () => {
+  return serviceStore.servicesList
+    .filter(isInsuranceService)
+    .map(s => s.asId)
 }
 
 const toggleService = (ticketId, serviceId) => {
@@ -61,19 +85,28 @@ const toggleService = (ticketId, serviceId) => {
     selectedServices.value[ticketId] = new Set()
   }
   const set = selectedServices.value[ticketId]
-  if (set.has(serviceId)) {
-    set.delete(serviceId)
-  } else {
+  const service = serviceStore.servicesList.find(s => s.asId === serviceId)
+
+  if (isInsuranceService(service)) {
+    if (set.has(serviceId)) return
+
+    const insuranceIds = getInsuranceIds()
+    insuranceIds.forEach(id => set.delete(id))
     set.add(serviceId)
+  } else {
+    if (set.has(serviceId)) {
+      set.delete(serviceId)
+    } else {
+      set.add(serviceId)
+    }
   }
-  // Trigger reactivity
+
   selectedServices.value = { ...selectedServices.value }
 }
 
 const isServiceSelected = (ticketId, serviceId) =>
   selectedServices.value[ticketId]?.has(serviceId) ?? false
 
-// Итоговая стоимость с учётом выбранных услуг
 const computedTotal = computed(() => {
   let total = 0
   props.booking.tickets?.forEach((ticket) => {
@@ -368,7 +401,6 @@ const viewTicket = (ticketId) => {
 .paid-note { font-size: 13px; color: #16a34a; font-weight: 500; }
 .cancelled-note { font-size: 13px; color: #dc2626; }
 
-/* Modal */
 .modal-overlay {
   position: fixed; inset: 0;
   background: rgba(0,0,0,0.5);

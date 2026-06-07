@@ -2,12 +2,6 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import axios from 'axios'
 
-// Изменения относительно старого API:
-// - addTicket и changeTicketStatus удалены → перенесены в useBookingStore
-// - getUserTickets удалён → билеты получаются через бронирование (GetBookingTickets)
-// - Добавлены: getBookingTickets, addService, removeService
-// - Ответ теперь массив (не объект-словарь), поэтому Object.keys() убран
-
 const BASE = 'http://localhost:5267/api'
 
 const useTicketStore = defineStore('tickets', () => {
@@ -44,7 +38,6 @@ const useTicketStore = defineStore('tickets', () => {
       .catch((err) => getError(err))
   }
 
-  // Билеты конкретного бронирования
   const getBookingTickets = async (bookingId) => {
     await axios
       .get(`${BASE}/Ticket/GetBookingTickets/${bookingId}`)
@@ -55,7 +48,6 @@ const useTicketStore = defineStore('tickets', () => {
       .catch((err) => getError(err))
   }
 
-  // Добавить дополнительную услугу к билету
   const addService = async (ticketId, serviceId) => {
     await axios
       .post(`${BASE}/Ticket/AddService`, { ticketId, serviceId })
@@ -65,7 +57,6 @@ const useTicketStore = defineStore('tickets', () => {
       .catch((err) => getError(err))
   }
 
-  // Удалить дополнительную услугу с билета
   const removeService = async (ticketId, serviceId) => {
     await axios
       .post(`${BASE}/Ticket/RemoveService`, { ticketId, serviceId })

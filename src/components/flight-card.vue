@@ -119,12 +119,10 @@ const getFlightTime = (arrivalTime, departureTime) => {
   text-align: center;
 }
 
-/* Выравнивание текста по левому краю для аккуратности */
 .flight-card p {
   text-align: center;
 }
 
-/* Цену во второй карточке прижмем вправо, к кнопке */
 .fifth-col p {
   text-align: right;
   padding-right: 10px;

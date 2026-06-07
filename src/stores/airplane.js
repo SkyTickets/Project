@@ -41,7 +41,6 @@ const useAirplaneStore = defineStore('airplanes', () => {
     return data
   }
 
-  // airplane: { plModel, plEconomySeats, plComfortSeats, plBusinessSeats, plFirstClassSeats }
   const addAirplane = async (airplane) => {
     await axios
       .post(`${BASE}/Airplane/AddAirplane`, {
@@ -85,7 +84,6 @@ const useAirplaneStore = defineStore('airplanes', () => {
       .catch((err) => getError(err))
   }
 
-  // Удобный список моделей для селектов
   const getModelNames = async () => {
     if (!airplanesList.value.length) {
       await getAirplanes()

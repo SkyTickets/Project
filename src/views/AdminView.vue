@@ -30,7 +30,6 @@ const serviceStore = useAdditionalServiceStore()
 const section = ref('dashboard')
 const loading = ref(false)
 
-// Modal state
 const modal = ref({ open: false, mode: 'add', entity: '', data: {} })
 
 const isManager = computed(() => userStore.currentUser?.uRole === 'Менеджер')
@@ -68,7 +67,6 @@ onMounted(async () => {
     await router.push('/')
     return
   }
-  // Загружаем данные для дашборда
   loading.value = true
   await Promise.all([
     flightStore.getFlights(),
@@ -157,17 +155,15 @@ const getOptions = (listName) => {
   return []
 }
 
-// 1. Ссылка на элемент-триггер в конце таблицы
 const scrollTrigger = ref(null)
 let observer = null
 
-// 2. Настройка наблюдателя
 const initObserver = () => {
   if (observer) observer.disconnect()
   observer = new IntersectionObserver(
     (entries) => {
       if (entries[0].isIntersecting && flightStore.hasMore) {
-        flightStore.loadMoreFlights()   // <-- было loadMoreCurrentFlights
+        flightStore.loadMoreFlights()  
       }
     },
     { threshold: 0.1 },
@@ -176,7 +172,6 @@ const initObserver = () => {
   if (scrollTrigger.value) observer.observe(scrollTrigger.value)
 }
 
-// 3. Запуск при переключении на вкладку рейсов
 watch(section, (newVal) => {
   if (newVal === 'flights') {
     nextTick(initObserver)
@@ -191,7 +186,6 @@ const openAdd = (entity) => {
 
 const openEdit = (entity, row) => {
   const data = { ...row }
-  // Привести даты для datetime-local
   if (entity === 'flight') {
     if (data.fDepartureTime) data.fDepartureTime = data.fDepartureTime.slice(0, 16)
     if (data.fArrivalTime) data.fArrivalTime = data.fArrivalTime.slice(0, 16)
@@ -797,10 +791,8 @@ const filteredList = (list) => {
   border-top: 1px solid #d6d8f0;
   display: flex;
   flex-direction: column;
-  /* убираем overflow-y: auto отсюда */
 }
 
-/* Прокручиваемая зона навигации */
 .sidebar > ul,
 .sidebar > div:not(.sidebar-footer):not(.sidebar-section-title) {
   overflow-y: auto;
@@ -855,7 +847,6 @@ const filteredList = (list) => {
   flex-shrink: 0;
 }
 
-/* Футер — прибит к низу */
 .sidebar-footer {
   margin-top: auto;
   padding: 12px 16px;
@@ -898,7 +889,6 @@ const filteredList = (list) => {
   flex-shrink: 0;
 }
 
-/* Content */
 .content {
   flex: 1;
   padding: 24px;
@@ -915,7 +905,6 @@ const filteredList = (list) => {
   margin-bottom: 16px;
 }
 
-/* Dashboard */
 .dashboard h3 {
   font-size: 20px;
   color: #1e1b4b;
@@ -946,7 +935,6 @@ const filteredList = (list) => {
   font-weight: 800;
 }
 
-/* Entity sections */
 .entity-list {
 }
 .header-bar {
@@ -1065,7 +1053,6 @@ tr:last-child td {
   background: #fecaca;
 }
 
-/* Chips */
 .status-chip {
   padding: 3px 10px;
   border-radius: 20px;
@@ -1098,7 +1085,6 @@ tr:last-child td {
   color: #9ca3af;
 }
 
-/* Modal */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -1126,7 +1112,7 @@ tr:last-child td {
 }
 
 .clickable-row:hover {
-  background-color: #f3f4f6; /* Легкая подсветка при наведении */
+  background-color: #f3f4f6;
 }
 
 .edit-modal-header {

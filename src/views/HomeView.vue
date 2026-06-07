@@ -18,12 +18,10 @@ const tripType = ref('oneway')
 
 const showPassengerPanel = ref(false)
 const passengers = ref({
-  adults: 1,
-  children: 0,
-  infants: 0
+  adults: 1
 })
 const selectedClass = ref('Эконом')
-const totalPassengers = () => passengers.value.adults + passengers.value.children + passengers.value.infants
+const totalPassengers = () => passengers.value.adults
 
 onMounted(async () => {
   if (!cities.value.length) {
@@ -266,6 +264,7 @@ input::-webkit-calendar-picker-indicator {
 
 .passenger-dropdown-wrapper {
   position: relative;
+  height: 5vh;
 }
 
 .passenger-selector {
@@ -274,8 +273,7 @@ input::-webkit-calendar-picker-indicator {
   align-items: center;
   justify-content: center;
   border-radius: 4px;
-  height: 5vh; /* Подстроено под высоту инпутов из вашего кода */
-  min-height: 44px;
+  height: 5vh;
   padding: 0 20px;
   background: white;
   border: 1px solid #cbd4e6;
@@ -287,7 +285,6 @@ input::-webkit-calendar-picker-indicator {
   user-select: none;
 }
 
-/* --- Оверлей для закрытия меню --- */
 .dropdown-overlay {
   position: fixed;
   top: 0;
@@ -297,7 +294,6 @@ input::-webkit-calendar-picker-indicator {
   z-index: 999;
 }
 
-/* --- Выпадающее меню --- */
 .passenger-dropdown-menu {
   position: absolute;
   top: calc(100% + 8px);
@@ -323,7 +319,6 @@ input::-webkit-calendar-picker-indicator {
   margin-top: 24px !important;
 }
 
-/* --- Строки с пассажирами --- */
 .passenger-row {
   display: flex;
   justify-content: space-between;
@@ -352,7 +347,6 @@ input::-webkit-calendar-picker-indicator {
   margin-top: 2px;
 }
 
-/* --- Кнопки счетчика --- */
 .counter {
   display: flex;
   align-items: center;
@@ -370,7 +364,7 @@ input::-webkit-calendar-picker-indicator {
   font-size: 20px;
   cursor: pointer;
   transition: all 0.2s ease;
-  padding-bottom: 2px; /* Легкая центровка символов */
+  padding-bottom: 2px;
 }
 
 .btn-minus {
@@ -405,7 +399,6 @@ input::-webkit-calendar-picker-indicator {
   color: #111419;
 }
 
-/* --- Радио-кнопки класса обслуживания --- */
 .radio-row {
   display: flex;
   justify-content: space-between;
@@ -450,7 +443,6 @@ input::-webkit-calendar-picker-indicator {
   transition: all 0.2s ease;
 }
 
-/* Состояние "Выбрано" (синий круг с белой точкой) */
 .custom-radio input:checked ~ .radio-circle {
   border: 6px solid #0066ff;
 }

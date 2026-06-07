@@ -51,12 +51,6 @@ const router = createRouter({
       component: () => import('@/views/AdminView.vue'),
       meta: { isLoginNeeded: true, isAdminPrivileges: true },
     },
-    {
-      path: '/admin/edit/:entity(flight|airline|airport)/:id(new|\\d+)',
-      name: 'AdminEdit',
-      component: () => import('@/views/AdminEdit.vue'),
-      meta: { isLoginNeeded: true, isAdminPrivileges: true }
-    },
   ],
 })
 

@@ -2,9 +2,6 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import axios from 'axios'
 
-// Новый стор для дополнительных услуг.
-// ExportAdditionalService: { asId, asName, asPrice }
-
 const BASE = 'http://localhost:5267/api'
 
 const useAdditionalServiceStore = defineStore('additionalServices', () => {
@@ -30,7 +27,6 @@ const useAdditionalServiceStore = defineStore('additionalServices', () => {
       .catch((err) => getError(err))
   }
 
-  // service: { asName, asPrice }
   const addService = async (service) => {
     await axios
       .post(`${BASE}/AdditionalService/AddService`, {

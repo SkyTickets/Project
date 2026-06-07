@@ -2,14 +2,6 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import axios from 'axios'
 
-// Новый стор для пассажиров.
-// Пассажир — отдельная сущность (не пользователь). Паспортные данные хранятся здесь,
-// а не в User (как было в старом API).
-//
-// ExportPassenger:
-//   pId, pSurname, pName, pPatronymic, pBirthdate (DateOnly 'YYYY-MM-DD'),
-//   pPassportSerial, pPassportNumber
-
 const BASE = 'http://localhost:5267/api'
 
 const usePassengerStore = defineStore('passengers', () => {
@@ -78,7 +70,7 @@ const usePassengerStore = defineStore('passengers', () => {
         pSurname: passenger.pSurname,
         pName: passenger.pName,
         pPatronymic: passenger.pPatronymic ?? null,
-        pBirthdate: passenger.pBirthdate, // строка 'YYYY-MM-DD'
+        pBirthdate: passenger.pBirthdate,
         pPassportSerial: passenger.pPassportSerial,
         pPassportNumber: passenger.pPassportNumber,
       })

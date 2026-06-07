@@ -2,13 +2,6 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import axios from 'axios'
 
-// Изменения относительно старого API:
-// - register: убраны поля uPassportSerial, uPassportNumber, uRole (паспорт теперь у Passenger,
-//   роль назначается сервером автоматически как «Клиент»)
-// - getUser: исправлен — теперь возвращает данные (раньше return был внутри .then, не выходя из async fn)
-// - Добавлен uploadUserImage
-// - Ответ API теперь массив, Object.keys() убран в getUsers
-
 const BASE = 'http://localhost:5267/api'
 
 const useUserStore = defineStore('users', () => {
@@ -70,7 +63,7 @@ const useUserStore = defineStore('users', () => {
         uPatronymic: user.patronymic ?? null,
         uEmail: user.login,
         uPassword: user.password,
-        uRole: '',         // сервер назначит «Клиент» автоматически
+        uRole: '',
         uPhone: user.phone,
         uBirthdate: user.birthdate,
       })
@@ -91,7 +84,7 @@ const useUserStore = defineStore('users', () => {
     await axios
       .get(`${BASE}/User/GetUsers`)
       .then((res) => {
-        usersList.value = res.data   // API возвращает массив напрямую
+        usersList.value = res.data
         userError.value = null
       })
       .catch((err) => getError(err))
@@ -154,7 +147,6 @@ const useUserStore = defineStore('users', () => {
       .catch((err) => getError(err))
   }
 
-  // Загрузить аватар пользователя (multipart/form-data)
   async function uploadUserImage(userId, file) {
     const formData = new FormData()
     formData.append('userId', userId)
