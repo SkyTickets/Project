@@ -327,10 +327,6 @@ input::-webkit-calendar-picker-indicator {
   border-bottom: 1px solid #f1f5f9;
 }
 
-.passenger-row.border-none {
-  border-bottom: none;
-}
-
 .passenger-info {
   display: flex;
   flex-direction: column;
