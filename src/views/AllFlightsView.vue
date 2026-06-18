@@ -84,6 +84,7 @@ const pairedFlights = computed(() => {
 
   for (const outFlight of outbound) {
     for (const retFlight of returnList) {
+      if (retFlight.fDepartureTime < outFlight.fDepartureTime) continue
       pairs.push({
         outbound: outFlight,
         return: retFlight,
